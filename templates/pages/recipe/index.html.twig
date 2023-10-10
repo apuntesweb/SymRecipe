@@ -1,20 +1,56 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello RecipeController!{% endblock %}
+{% block title %}SymRecipe - Mes recettes{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/Users/rbugarin/OneDrive - Micropole/Documents/www/youtube/symrecipe/src/Controller/RecipeController.php'|file_link(0) }}">src/Controller/RecipeController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/Users/rbugarin/OneDrive - Micropole/Documents/www/youtube/symrecipe/templates/recipe/index.html.twig'|file_link(0) }}">templates/recipe/index.html.twig</a></code></li>
-    </ul>
-</div>
+    <div class="container mt-4">
+        {% if not recipes is same as([]) %}
+            <h1>Mes recettes</h1>
+            <a href="{{ path('recipe.new') }}" class="btn btn-primary">Créer une recette</a>
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success mt-4">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <div class="count mt-4">
+                Il y a {{ recipes.getTotalItemCount }} recettes au total.
+            </div>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Prix</th>
+                    <th scope="col">Difficulté</th>
+                    <th scope="col">Date de création</th>
+                    <th scope="col">Edition</th>
+                    <th scope="col">Suppresion</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for recipe in recipes %}
+                    <tr class="table-primary">
+                        <th scope="row">{{ recipe.id }}</th>
+                        <td>{{ recipe.name }}</td>
+                        <td>{{ (recipe.price is same as(null)) ? 'Non renseigné' : recipe.price }}</td>
+                        <td>{{ (recipe.difficulty is same as(null)) ? 'Non renseigné' : recipe.difficulty }}</td>
+                        <td>{{ recipe.createdAt|date("d/m/Y") }}</td>
+                        <td>
+                            <a href="{{ path('recipe.edit', { id: recipe.id }) }}" class="btn btn-info">Modifier</a>
+                        </td>
+                        <td>
+                            <a href="{{ path('recipe.delete', { id: recipe.id}) }}" class="btn btn-warning">Supprimer</a>
+                        </td>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="navigation d-flex justify-content-center mt-4">
+                {{ knp_pagination_render(recipes) }}
+            </div>
+        {% else %}
+            <h4>Il n'y a pas de recettes.</h4>
+        {% endif %}
+    </div>
 {% endblock %}
