@@ -38,9 +38,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private ?string $plainPassword = null ;
 
+    private ?string $newPassword = null;
+
+    public function getNewPassword(): ?string
+    {
+        return $this->newPassword;
+    }
+
+    public function setNewPassword(?string $newPassword): void
+    {
+        $this->newPassword = $newPassword;
+    }
+
     #[ORM\Column]
     #[Assert\NotBlank()]
-    private ?string $password = null;
+    private string $password = 'password';
 
     #[ORM\Column]
     #[Assert\NotNull()]
