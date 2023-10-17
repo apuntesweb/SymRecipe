@@ -48,6 +48,39 @@ class RecipeController extends AbstractController
     }
 
     /**
+     * This controller allow us to see a recipe if this one is public
+     * @return Response
+     */
+    #[Route('/recette/publique', 'recipe.index.public', methods: ['GET'])]
+    public function indexPublic(RecipeRepository $repository, PaginatorInterface $paginator, Request $request) : Response
+    {
+        $recipes = $paginator->paginate(
+            $repository->findPublicRecipe(null),
+            $request->query->getInt('page', 1),
+            10
+        );
+        return $this->render('pages/recipe/index_public.html.twig', [
+            'recipes' => $recipes
+        ]);
+    }
+
+    #[Route('/recette/{id}', 'recipe.show', methods: ['GET'])]
+    public function show(RecipeRepository $repository, int $id, Request $request, EntityManagerInterface $manager): Response
+    {
+        $recipe = $repository->findOneBy(["id" => $id]);
+        if (($this->security->isGranted('ROLE_USER') && $recipe->getIsPublic() === true) ||
+            ($this->security->isGranted('ROLE_USER') && $recipe->getUser() === $this->security->getUser())) {
+            return $this->render('pages/recipe/show.html.twig', [
+                'recipe' => $recipe,
+            ]);
+        } elseif ($this->security->isGranted('ROLE_USER')) {
+            return $this->redirectToRoute('recipe.index');
+        } else {
+            return $this->redirectToRoute('security.login');
+        }
+    }
+
+    /**
      * This controller allow us to create a new recipe
      * @param Request $request
      * @param EntityManagerInterface $manager
