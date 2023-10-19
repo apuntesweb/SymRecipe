@@ -6,11 +6,14 @@
 {% block body %}
     <div class="container mt-4">
         <div class="jumbotron">
-            <h1 class="display-4">Bienvenue sur SymRecipe</h1>
-            <p class="lead">SymRecipe est une application qui va te permettre de créer des recettes à base d'ingredients que tu auras toi-même. Tu pourras partager tes recettes à la communauté du site, ou bien les garder en privées.</p>
-            <hr class="my-4">
-            <p>Pour commencer, rendez-vous sur la page d'inscription pour utiliser l'application.</p>
-            <a class="btn btn-primary btn-lg" href="{{ '/inscription' }}" role="button">Inscription</a>
+            {% if app.user is empty %}
+                <h1 class="display-4">Bienvenue sur SymRecipe</h1>
+                <p class="lead">SymRecipe est une application qui va te permettre de créer des recettes à base d'ingredients que tu auras toi-même. Tu pourras partager tes recettes à la communauté du site, ou bien les garder en privées.</p>
+                <hr class="my-4">
+                <p>Pour commencer, rendez-vous sur la page d'inscription pour utiliser l'application.</p>
+                <a class="btn btn-primary btn-lg" href="{{ '/inscription' }}" role="button">Inscription</a>
+                <a class="btn btn-primary btn-lg" href="{{ '/connexion  ' }}" role="button">Connexion</a>
+            {% endif %}
         </div>
         <div class="recipes mt-4">
             <h2 class="mt-4">Recettes de la communauté</h2>
@@ -20,11 +23,15 @@
                         <div class="card-header">Recette n° {{ recipe.id }}</div>
                         <div class="card-body">
                             <h4 class="card-tittle">{{ recipe.name }}</h4>
+                            <img src="../images/recette/{{ recipe.getImageName() }}" alt="" style="width: -webkit-fill-available; height: 13rem;">
                             <p class="card-text">{{ recipe.description|slice(0,100) ~ '... ' }}</p>
                             <a href="{{ path('recipe.show', {id: recipe.id}) }}" class="card-link">Voir recette</a>
                         </div>
                     </div>
                 {% endfor %}
+            </div>
+            <div class="link-offset-3 mt-4">
+                <p><a href="{{ path('recipe.community') }}" class="nav-link active">🧑‍🍳 Voir plus de recettes de la communauté</a></p>
             </div>
         </div>
     </div>

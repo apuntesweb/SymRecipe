@@ -25,6 +25,41 @@ class RecipeController extends AbstractController
     {
         $this->security = $security;
     }
+
+    /**
+     * This controller allow us to create a new recipe
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return Response
+     */
+    #[Route('/recette/creation', 'recipe.new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $manager) : Response
+    {
+        if ($this->security->isGranted('ROLE_USER')) {
+            $recipe = new Recipe();
+            $form = $this->createForm(RecipeType::class, $recipe);
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $recipe = $form->getData();
+                $recipe->setUser($this->getUser());
+                $recipe->setUser($this->getUser());
+                $manager->persist($recipe);
+                $manager->flush();
+                $this->addFlash(
+                    'success',
+                    'Votre recette à été crée avec succès !'
+                );
+                return $this->redirectToRoute('recipe.index');
+            }
+            return $this->render('pages/recipe/new.html.twig', [
+                'form' => $form->createView()
+            ]);
+        } else {
+            return $this->redirectToRoute('security.login');
+        }
+
+    }
+
     /**
      *  This controller display all the recipes
      * @param RecipeRepository $repository
@@ -54,7 +89,7 @@ class RecipeController extends AbstractController
      * This controller allow us to see a recipe if this one is public
      * @return Response
      */
-    #[Route('/recette/publique', 'recipe.index.public', methods: ['GET'])]
+    #[Route('/recette/communaute', 'recipe.community', methods: ['GET'])]
     public function indexPublic(RecipeRepository $repository, PaginatorInterface $paginator, Request $request) : Response
     {
         $recipes = $paginator->paginate(
@@ -68,11 +103,14 @@ class RecipeController extends AbstractController
     }
 
     #[Route('/recette/{id}', 'recipe.show', methods: ['GET','POST'])]
-    public function show(RecipeRepository $repository, int $id, Request $request, EntityManagerInterface $manager,
+    public function show(int $id, RecipeRepository $repository, Request $request, EntityManagerInterface
+$manager,
                          MarkRepository $markRepository): Response
     {
         $recipe = $repository->findOneBy(["id" => $id]);
-        if (($this->security->isGranted('ROLE_USER') && $recipe->getIsPublic() === true) || ($this->security->isGranted('ROLE_USER') && $recipe->getUser() === $this->security->getUser())) {
+        if (($this->security->isGranted('ROLE_USER') && isset($recipe) && $recipe->getIsPublic() === true) ||
+            ($this->security->isGranted('ROLE_USER') && isset($recipe) && $recipe->getUser() ===
+        $this->security->getUser())) {
             $mark = new Mark();
             $form = $this->createForm(MarkType::class, $mark);
             $form->handleRequest($request);
@@ -103,39 +141,6 @@ class RecipeController extends AbstractController
         } else {
             return $this->redirectToRoute('security.login');
         }
-    }
-
-    /**
-     * This controller allow us to create a new recipe
-     * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @return Response
-     */
-    #[Route('/recette/creation', 'recipe.new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $manager) : Response
-    {
-        if ($this->security->isGranted('ROLE_USER')) {
-            $recipe = new Recipe();
-            $form = $this->createForm(RecipeType::class, $recipe);
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                $recipe = $form->getData();
-                $recipe->setUser($this->getUser());
-                $manager->persist($recipe);
-                $manager->flush();
-                $this->addFlash(
-                    'success',
-                    'Votre recette à été crée avec succès !'
-                );
-                return $this->redirectToRoute('recipe.index');
-            }
-            return $this->render('pages/recipe/new.html.twig', [
-                'form' => $form->createView()
-            ]);
-        } else {
-            return $this->redirectToRoute('security.login');
-        }
-
     }
 
     /**

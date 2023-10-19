@@ -19,6 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class RecipeType extends AbstractType
 {
@@ -120,13 +121,36 @@ class RecipeType extends AbstractType
                     'class' => 'form-check-input'
                 ],
                 'required' => false,
-                'label' => 'Favoris ?',
+                'label' => 'Favoris ? ',
                 'label_attr' => [
                     'class' => 'form-check-label'
                 ],
                 'constraints' => [
                     new Assert\NotNull()
                 ]
+            ])
+            ->add('isPublic', CheckboxType::class, [
+                'attr' => [
+                    'class' => 'form-check-input'
+                ],
+                'required' => false,
+                'label' => 'Publique ? ',
+                'label_attr' => [
+                    'class' => 'form-check-label'
+                ],
+                'constraints' => [
+                    new Assert\NotNull()
+                ]
+            ])
+            ->add('imageFile', VichImageType::class, [
+                'label' => 'Image de la recette',
+                'label_attr' => [
+                    'class' => 'form-label mt-4'
+                ],
+                'required' => false,
+                'allow_delete' => true,
+                'download_uri' => true,
+
             ])
             ->add('ingredients', EntityType::class, [
                 'class' => Ingredient::class,

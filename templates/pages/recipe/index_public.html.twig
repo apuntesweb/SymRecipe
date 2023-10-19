@@ -12,7 +12,15 @@
                         <div class="card-header">Recette n° {{ recipe.id }}</div>
                         <div class="card-body">
                             <h4 class="card-tittle">{{ recipe.name }}</h4>
+                            <div class="recipe_name">
+                                {% if vich_uploader_asset(recipe, 'imageFile') %}
+                                    <img style="width: 280px; height: 200px" src="{{ vich_uploader_asset(recipe, 'imageFile') }}">
+                                    {% else %}
+                                        <img src="../images/recette/cocina2j-65311c985106f633695662.jpg" style="width: 280px; height: 200px">
+                                {% endif %}
+                            </div>
                             <p class="card-text">{{ recipe.description|slice(0,100) ~ '... ' }}</p>
+                            <a href="{{ path('recipe.show', {id: recipe.id}) }}" class="card-link">Voir recette</a>
                         </div>
                     </div>
                 {% endfor %}
@@ -22,3 +30,8 @@
         {% endif %}
     </div>
 {% endblock %}
+
+{#
+Video 19 minuto 4
+https://www.youtube.com/watch?v=E_EapoRwhRQ&t=1s
+#}
